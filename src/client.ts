@@ -1,18 +1,18 @@
 import { HttpClient } from "./http";
-import { Deployments } from "./resources/deployments";
 import { Runs } from "./resources/runs";
+import { Projects } from "./resources/projects";
 
 export type ClientOptions = {
   apiKey: string;
 };
 
 export class A22A {
-  readonly deployments: Deployments;
+  readonly projects: Projects;
   readonly runs: Runs;
 
   constructor(options: ClientOptions) {
     const http = new HttpClient(options.apiKey);
-    this.deployments = new Deployments(http);
+    this.projects = new Projects(http);
     this.runs = new Runs(http);
   }
 }

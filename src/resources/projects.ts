@@ -1,13 +1,13 @@
 import { z } from "zod";
 import type { HttpClient } from "../http";
 
-const Deployment = z.object({
+const Project = z.object({
   id: z.string(),
   project: z.string(),
   version: z.number().int(),
   manifest: z.object({
     project: z.string(),
-    flows: z.record(
+    workflows: z.record(
       z.string(),
       z.object({
         steps: z.array(
@@ -23,19 +23,19 @@ const Deployment = z.object({
   })
 });
 
-export type Deployment = z.infer<typeof Deployment>;
+export type Project = z.infer<typeof Project>;
 
-const CreatedDeployment = z.object({
+const Deployed = z.object({
   project: z.string(),
   version: z.number().int(),
-  flows: z.array(z.string())
+  workflows: z.array(z.string())
 });
 
-export type CreatedDeployment = z.infer<typeof CreatedDeployment>;
+export type Deployed = z.infer<typeof Deployed>;
 
 export type Manifest = {
   project: string;
-  flows: Record<
+  workflows: Record<
     string,
     {
       steps: {
@@ -48,14 +48,14 @@ export type Manifest = {
   >;
 };
 
-export class Deployments {
+export class Projects {
   constructor(private readonly http: HttpClient) {}
 
-  public async create(manifest: Manifest): Promise<CreatedDeployment> {
-    return this.http.post("/v1/deploy", manifest, CreatedDeployment);
+  public async deploy(manifest: Manifest): Promise<Deployed> {
+    return this.http.post("/v1/deploy", manifest, Deployed);
   }
 
-  public async retrieve(project: string): Promise<Deployment> {
-    return this.http.get(`/v1/deploy/${project}`, Deployment);
+  public async retrieve(project: string): Promise<Project> {
+    return this.http.get(`/v1/deploy/${project}`, Project);
   }
 }
