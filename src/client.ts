@@ -9,7 +9,6 @@ export type ClientOptions = {
 };
 
 export class A22A {
-  /** Everything the SDK throws. `err instanceof A22A.errors.A22AError` catches all of it. */
   static errors = Errors;
 
   readonly projects: Projects;
