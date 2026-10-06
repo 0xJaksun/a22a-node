@@ -11,7 +11,7 @@ describe("VERSION", () => {
 
     expect(Package.safeParse(pkg)).toStrictEqual({
       success: true,
-      data: { version: VERSION },
+      data: { version: VERSION }
     });
   });
 });
