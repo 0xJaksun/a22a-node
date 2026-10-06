@@ -9,7 +9,6 @@ export type ClientOptions = {
 };
 
 export class A22A {
-  /** Everything the SDK throws. `err instanceof A22A.errors.A22AError` catches all of it. */
   static errors = Errors;
 
   readonly projects: Projects;
@@ -21,5 +20,22 @@ export class A22A {
     this.projects = new Projects(http);
     this.runs = new Runs(http);
     this.webhooks = new Webhooks();
+  }
+}
+
+/** The error classes as types, so `A22A.errors.NotFoundError` annotates as well as narrows. */
+export namespace A22A {
+  export namespace errors {
+    export type A22AError = Errors.A22AError;
+    export type APIError = Errors.APIError;
+    export type APIConnectionError = Errors.APIConnectionError;
+    export type AuthenticationError = Errors.AuthenticationError;
+    export type BadRequestError = Errors.BadRequestError;
+    export type InternalServerError = Errors.InternalServerError;
+    export type InvalidResponseError = Errors.InvalidResponseError;
+    export type InvalidWebhookPayloadError = Errors.InvalidWebhookPayloadError;
+    export type InvalidWebhookSignatureError =
+      Errors.InvalidWebhookSignatureError;
+    export type NotFoundError = Errors.NotFoundError;
   }
 }
