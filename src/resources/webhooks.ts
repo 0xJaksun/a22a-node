@@ -4,24 +4,24 @@ import {
   InvalidWebhookPayloadError,
   InvalidWebhookSignatureError
 } from "../error";
-import { Run } from "./runs";
+import { RunSchema } from "./runs";
 
 const TOLERANCE = 300;
 
-const Event = z.object({
+const WebhookEventSchema = z.object({
   type: z.enum(["run.completed", "run.failed"]),
   created: z.string(),
-  data: Run
+  data: RunSchema
 });
 
-export type Event = z.infer<typeof Event>;
+export type WebhookEvent = z.infer<typeof WebhookEventSchema>;
 
-const Payload = z
+const PayloadSchema = z
   .string()
   .transform((body) => JSON.parse(body))
-  .pipe(Event);
+  .pipe(WebhookEventSchema);
 
-const Signature = z
+const SignatureSchema = z
   .string()
   .transform((header) =>
     Object.fromEntries(header.split(",").map((pair) => pair.split("=")))
@@ -36,13 +36,13 @@ export type ConstructEventParams = {
 };
 
 export class Webhooks {
-  public constructEvent(params: ConstructEventParams): Event {
+  public constructEvent(params: ConstructEventParams): WebhookEvent {
     const { body, signature, secret } = params;
 
     if (signature === null) {
       throw new InvalidWebhookSignatureError("Missing signature header");
     }
-    const header = Signature.safeParse(signature);
+    const header = SignatureSchema.safeParse(signature);
     if (!header.success) {
       throw new InvalidWebhookSignatureError("Malformed signature header");
     }
@@ -55,7 +55,7 @@ export class Webhooks {
       throw new InvalidWebhookSignatureError("Signature mismatch");
     }
 
-    const event = Payload.safeParse(body);
+    const event = PayloadSchema.safeParse(body);
     if (!event.success) {
       throw new InvalidWebhookPayloadError("Payload is not a known event");
     }

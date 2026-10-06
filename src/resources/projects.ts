@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { HttpClient } from "../http";
 
-const Project = z.object({
+const ProjectSchema = z.object({
   id: z.string(),
   project: z.string(),
   version: z.number().int(),
@@ -23,15 +23,15 @@ const Project = z.object({
   })
 });
 
-export type Project = z.infer<typeof Project>;
+export type Project = z.infer<typeof ProjectSchema>;
 
-const ProjectSummary = z.object({
+const ProjectSummarySchema = z.object({
   project: z.string(),
   version: z.number().int(),
   workflows: z.array(z.string())
 });
 
-export type ProjectSummary = z.infer<typeof ProjectSummary>;
+export type ProjectSummary = z.infer<typeof ProjectSummarySchema>;
 
 export type Manifest = {
   project: string;
@@ -52,10 +52,10 @@ export class Projects {
   constructor(private readonly http: HttpClient) {}
 
   public async deploy(manifest: Manifest): Promise<ProjectSummary> {
-    return this.http.post("/v1/deploy", manifest, ProjectSummary);
+    return this.http.post("/v1/deploy", manifest, ProjectSummarySchema);
   }
 
   public async retrieve(project: string): Promise<Project> {
-    return this.http.get(`/v1/deploy/${project}`, Project);
+    return this.http.get(`/v1/deploy/${project}`, ProjectSchema);
   }
 }

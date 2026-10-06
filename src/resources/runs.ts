@@ -1,31 +1,34 @@
 import { z } from "zod";
 import type { HttpClient } from "../http";
 
-const InvokedRun = z.object({
+const InvokedRunSchema = z.object({
   run_id: z.string()
 });
 
-export type InvokedRun = z.infer<typeof InvokedRun>;
+export type InvokedRun = z.infer<typeof InvokedRunSchema>;
 
-const StepBase = z.object({ step_id: z.string() });
-const Step = z.discriminatedUnion("status", [
-  StepBase.extend({ status: z.literal("pending") }),
-  StepBase.extend({ status: z.literal("running") }),
-  StepBase.extend({ status: z.literal("completed"), output: z.string() }),
-  StepBase.extend({ status: z.literal("failed"), error: z.string() })
+const StepBaseSchema = z.object({ step_id: z.string() });
+const StepSchema = z.discriminatedUnion("status", [
+  StepBaseSchema.extend({ status: z.literal("pending") }),
+  StepBaseSchema.extend({ status: z.literal("running") }),
+  StepBaseSchema.extend({ status: z.literal("completed"), output: z.string() }),
+  StepBaseSchema.extend({ status: z.literal("failed"), error: z.string() })
 ]);
 
-export type Step = z.infer<typeof Step>;
+export type Step = z.infer<typeof StepSchema>;
 
-const RunBase = z.object({ run_id: z.string(), steps: z.array(Step) });
-export const Run = z.discriminatedUnion("status", [
-  RunBase.extend({ status: z.literal("queued") }),
-  RunBase.extend({ status: z.literal("running") }),
-  RunBase.extend({ status: z.literal("completed") }),
-  RunBase.extend({ status: z.literal("failed"), error: z.string() })
+const RunBaseSchema = z.object({
+  run_id: z.string(),
+  steps: z.array(StepSchema)
+});
+export const RunSchema = z.discriminatedUnion("status", [
+  RunBaseSchema.extend({ status: z.literal("queued") }),
+  RunBaseSchema.extend({ status: z.literal("running") }),
+  RunBaseSchema.extend({ status: z.literal("completed") }),
+  RunBaseSchema.extend({ status: z.literal("failed"), error: z.string() })
 ]);
 
-export type Run = z.infer<typeof Run>;
+export type Run = z.infer<typeof RunSchema>;
 
 export type InvokeParams = {
   project: string;
@@ -41,11 +44,11 @@ export class Runs {
     return this.http.post(
       `/v1/run/${project}/${workflow}`,
       { input },
-      InvokedRun
+      InvokedRunSchema
     );
   }
 
   public async retrieve(id: string): Promise<Run> {
-    return this.http.get(`/v1/runs/${id}`, Run);
+    return this.http.get(`/v1/runs/${id}`, RunSchema);
   }
 }
