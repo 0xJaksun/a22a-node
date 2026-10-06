@@ -2,7 +2,7 @@ import type { z } from "zod";
 import { APIConnectionError, APIError, InvalidResponseError } from "./error";
 import { VERSION } from "./version";
 
-const BASE_URL = "https://api.a22a.dev";
+const BASE_URL = "https://api.a22a.sh";
 const TIMEOUT = 30_000;
 
 interface IHttpClient {

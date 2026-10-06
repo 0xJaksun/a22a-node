@@ -64,7 +64,7 @@ describe("Projects.deploy", () => {
     const req = sentRequest(api);
     expect(req).toMatchObject({
       method: "POST",
-      url: "https://api.a22a.dev/v1/deploy"
+      url: "https://api.a22a.sh/v1/deploy"
     });
     await expect(req.json()).resolves.toStrictEqual(manifest);
   });
@@ -111,7 +111,7 @@ describe("Projects.retrieve", () => {
     await expect(projects.retrieve("acme")).resolves.toStrictEqual(mockProject);
     expect(sentRequest(api)).toMatchObject({
       method: "GET",
-      url: "https://api.a22a.dev/v1/deploy/acme"
+      url: "https://api.a22a.sh/v1/deploy/acme"
     });
   });
 

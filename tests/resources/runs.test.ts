@@ -21,7 +21,7 @@ describe("Runs.invoke", () => {
     const req = sentRequest(api);
     expect(req).toMatchObject({
       method: "POST",
-      url: "https://api.a22a.dev/v1/run/acme/summarise"
+      url: "https://api.a22a.sh/v1/run/acme/summarise"
     });
     await expect(req.json()).resolves.toStrictEqual({ input: { text: "hi" } });
   });
@@ -123,7 +123,7 @@ describe("Runs.retrieve", () => {
       );
       expect(sentRequest(api)).toMatchObject({
         method: "GET",
-        url: `https://api.a22a.dev/v1/runs/${mockRun.run_id}`
+        url: `https://api.a22a.sh/v1/runs/${mockRun.run_id}`
       });
     }
   );
