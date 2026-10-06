@@ -25,8 +25,35 @@ const Deployment = z.object({
 
 export type Deployment = z.infer<typeof Deployment>;
 
+const CreatedDeployment = z.object({
+  project: z.string(),
+  version: z.number().int(),
+  flows: z.array(z.string())
+});
+
+export type CreatedDeployment = z.infer<typeof CreatedDeployment>;
+
+export type Manifest = {
+  project: string;
+  flows: Record<
+    string,
+    {
+      steps: {
+        id: string;
+        prompt: string;
+        needs?: string[];
+        output?: Record<string, unknown>;
+      }[];
+    }
+  >;
+};
+
 export class Deployments {
   constructor(private readonly http: HttpClient) {}
+
+  public async create(manifest: Manifest): Promise<CreatedDeployment> {
+    return this.http.post("/v1/deploy", manifest, CreatedDeployment);
+  }
 
   public async retrieve(project: string): Promise<Deployment> {
     return this.http.get(`/v1/deploy/${project}`, Deployment);
