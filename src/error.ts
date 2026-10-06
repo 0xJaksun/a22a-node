@@ -91,3 +91,7 @@ export class APIConnectionError extends APIError<undefined> {
 export class InvalidWebhookSignatureError extends A22AError {
   override readonly type = "InvalidWebhookSignatureError";
 }
+
+export class InvalidWebhookPayloadError extends A22AError {
+  override readonly type = "InvalidWebhookPayloadError";
+}

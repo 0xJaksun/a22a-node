@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { A22A } from "../src/client";
 import { Projects } from "../src/resources/projects";
 import { Runs } from "../src/resources/runs";
+import { Webhooks } from "../src/resources/webhooks";
 
 describe("A22A", () => {
   it("mounts the resources", () => {
@@ -9,5 +10,6 @@ describe("A22A", () => {
 
     expect(a22a.projects).toBeInstanceOf(Projects);
     expect(a22a.runs).toBeInstanceOf(Runs);
+    expect(a22a.webhooks).toBeInstanceOf(Webhooks);
   });
 });
