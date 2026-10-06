@@ -5,7 +5,7 @@ const ErrorBody = z.object({ error: z.string() });
 type APIErrorParams<TStatus> = {
   status: TStatus;
   message: string;
-  requestId: string;
+  requestId?: string;
   body?: unknown;
   code?: string;
   cause?: unknown;
@@ -22,7 +22,7 @@ export class APIError<
   readonly status: TStatus;
   readonly body: unknown;
   readonly code: string | undefined;
-  readonly requestId: string;
+  readonly requestId: string | undefined;
 
   constructor(params: APIErrorParams<TStatus>) {
     super(params.message, { cause: params.cause });
@@ -32,7 +32,11 @@ export class APIError<
     this.code = params.code;
   }
 
-  static generate(status: number, body: unknown, requestId: string): APIError {
+  static generate(
+    status: number,
+    body: unknown,
+    requestId: string | undefined
+  ): APIError {
     const parsed = ErrorBody.safeParse(body);
     const code = parsed.success ? parsed.data.error : undefined;
     const message = `${status} ${code ?? "unknown error"}`;
@@ -79,7 +83,7 @@ export class InvalidResponseError extends APIError<number> {
 export class APIConnectionError extends APIError<undefined> {
   override readonly type = "APIConnectionError";
 
-  constructor(params: { requestId: string; cause: unknown }) {
+  constructor(params: { cause: unknown }) {
     super({ ...params, status: undefined, message: "Connection error" });
   }
 }

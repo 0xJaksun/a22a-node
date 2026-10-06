@@ -105,7 +105,7 @@ describe("InvalidResponseError and APIConnectionError", () => {
       status: 200
     },
     {
-      err: new APIConnectionError({ requestId, cause }),
+      err: new APIConnectionError({ cause }),
       type: "APIConnectionError",
       message: "Connection error",
       status: undefined
