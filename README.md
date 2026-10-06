@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/logo.jpg" alt="A22A" width="480">
+</p>
+
 # A22A Node.js Library
 
 The A22A Node.js library provides convenient access to the A22A API from applications written in server-side JavaScript and TypeScript.
