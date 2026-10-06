@@ -20,7 +20,7 @@ describe("HttpClient", () => {
     );
 
     await expect(client.get("/v1/runs/run_1", Echo)).resolves.toMatchObject({
-      url: "https://api.a22a.dev/v1/runs/run_1",
+      url: "https://api.a22a.sh/v1/runs/run_1",
       headers: { "x-api-key": "key_1", "user-agent": `a22a-node/${VERSION}` }
     });
   });
