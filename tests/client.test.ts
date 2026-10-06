@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { A22A } from "../src/client";
-import { Runs } from "../src/resources/runs";
 import { Projects } from "../src/resources/projects";
+import { Runs } from "../src/resources/runs";
 
 describe("A22A", () => {
   it("mounts the resources", () => {
