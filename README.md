@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/logo.jpg">
+  <img src=".github/logo-light.jpg" alt="A22A" width="100%">
+</picture>
+
 # A22A Node.js Library
 
 The A22A Node.js library provides convenient access to the A22A API from applications written in server-side JavaScript and TypeScript.
