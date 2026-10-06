@@ -19,6 +19,8 @@ Node.js 20.19 or later.
 
 ```sh
 npm install a22a
+# or
+pnpm add a22a
 ```
 
 ## Usage
