@@ -1,9 +1,30 @@
 {
   "name": "a22a",
   "version": "0.0.0",
+  "description": "Node.js SDK for a22a, the hosted runner for multi-step LLM workflows.",
   "type": "module",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xJaksun/a22a-node.git"
+  },
+  "homepage": "https://a22a.sh",
+  "bugs": "https://github.com/0xJaksun/a22a-node/issues",
+  "keywords": [
+    "a22a",
+    "llm",
+    "ai",
+    "workflow",
+    "workflows",
+    "serverless",
+    "prompt chain",
+    "agents",
+    "orchestration",
+    "openai",
+    "anthropic",
+    "sdk"
+  ],
   "packageManager": "pnpm@11.5.3",
   "engines": {
     "node": ">=20.19"
