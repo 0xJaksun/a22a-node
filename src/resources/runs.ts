@@ -18,7 +18,7 @@ const Step = z.discriminatedUnion("status", [
 export type Step = z.infer<typeof Step>;
 
 const RunBase = z.object({ run_id: z.string(), steps: z.array(Step) });
-const Run = z.discriminatedUnion("status", [
+export const Run = z.discriminatedUnion("status", [
   RunBase.extend({ status: z.literal("queued") }),
   RunBase.extend({ status: z.literal("running") }),
   RunBase.extend({ status: z.literal("completed") }),
