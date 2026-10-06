@@ -2,15 +2,10 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { HttpClient } from "../src/http";
 import { VERSION } from "../src/version";
+import { mockFetch } from "./helpers";
 
 const Run = z.object({ id: z.string() });
 const Echo = z.record(z.string(), z.unknown());
-
-function mockFetch(
-  api: (req: Request) => Response | Promise<Response>
-): typeof fetch {
-  return async (url, init) => api(new Request(url, init));
-}
 
 describe("HttpClient", () => {
   it("sends the key and the user-agent to the base url", async () => {
