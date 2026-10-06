@@ -1,15 +1,4 @@
-import {
-  A22AError,
-  APIConnectionError,
-  APIError,
-  AuthenticationError,
-  BadRequestError,
-  InternalServerError,
-  InvalidResponseError,
-  InvalidWebhookPayloadError,
-  InvalidWebhookSignatureError,
-  NotFoundError
-} from "./error";
+import * as Errors from "./error";
 import { HttpClient } from "./http";
 import { Projects } from "./resources/projects";
 import { Runs } from "./resources/runs";
@@ -20,18 +9,8 @@ export type ClientOptions = {
 };
 
 export class A22A {
-  static errors = {
-    A22AError,
-    APIError,
-    APIConnectionError,
-    AuthenticationError,
-    BadRequestError,
-    InternalServerError,
-    InvalidResponseError,
-    InvalidWebhookPayloadError,
-    InvalidWebhookSignatureError,
-    NotFoundError
-  };
+  /** Everything the SDK throws. `err instanceof A22A.errors.A22AError` catches all of it. */
+  static errors = Errors;
 
   readonly projects: Projects;
   readonly runs: Runs;
