@@ -25,13 +25,13 @@ const Project = z.object({
 
 export type Project = z.infer<typeof Project>;
 
-const Deployed = z.object({
+const ProjectSummary = z.object({
   project: z.string(),
   version: z.number().int(),
   workflows: z.array(z.string())
 });
 
-export type Deployed = z.infer<typeof Deployed>;
+export type ProjectSummary = z.infer<typeof ProjectSummary>;
 
 export type Manifest = {
   project: string;
@@ -51,8 +51,8 @@ export type Manifest = {
 export class Projects {
   constructor(private readonly http: HttpClient) {}
 
-  public async deploy(manifest: Manifest): Promise<Deployed> {
-    return this.http.post("/v1/deploy", manifest, Deployed);
+  public async deploy(manifest: Manifest): Promise<ProjectSummary> {
+    return this.http.post("/v1/deploy", manifest, ProjectSummary);
   }
 
   public async retrieve(project: string): Promise<Project> {
