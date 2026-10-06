@@ -1,6 +1,6 @@
 import { HttpClient } from "./http";
-import { Runs } from "./resources/runs";
 import { Projects } from "./resources/projects";
+import { Runs } from "./resources/runs";
 
 export type ClientOptions = {
   apiKey: string;
