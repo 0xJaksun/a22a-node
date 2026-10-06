@@ -36,21 +36,27 @@ function rejection(type: string, message: string) {
   return expect.objectContaining({ type, message });
 }
 
-describe("Webhooks.verify", () => {
+describe("Webhooks.constructEvent", () => {
   it("returns the event when the signature matches", () => {
     const signature = sign({ body, secret, timestamp: now() });
 
-    expect(webhooks.verify({ body, signature, secret })).toStrictEqual(event);
+    expect(webhooks.constructEvent({ body, signature, secret })).toStrictEqual(
+      event
+    );
   });
 
   it("rejects a missing header", () => {
-    expect(() => webhooks.verify({ body, signature: null, secret })).toThrow(
+    expect(() =>
+      webhooks.constructEvent({ body, signature: null, secret })
+    ).toThrow(
       rejection("InvalidWebhookSignatureError", "Missing signature header")
     );
   });
 
   it("rejects a malformed header", () => {
-    expect(() => webhooks.verify({ body, signature: "nope", secret })).toThrow(
+    expect(() =>
+      webhooks.constructEvent({ body, signature: "nope", secret })
+    ).toThrow(
       rejection("InvalidWebhookSignatureError", "Malformed signature header")
     );
   });
@@ -58,7 +64,7 @@ describe("Webhooks.verify", () => {
   it("rejects a delivery older than the tolerance", () => {
     const signature = sign({ body, secret, timestamp: now() - 301 });
 
-    expect(() => webhooks.verify({ body, signature, secret })).toThrow(
+    expect(() => webhooks.constructEvent({ body, signature, secret })).toThrow(
       rejection("InvalidWebhookSignatureError", "Timestamp outside tolerance")
     );
   });
@@ -67,14 +73,14 @@ describe("Webhooks.verify", () => {
     const signature = sign({ body, secret, timestamp: now() });
 
     expect(() =>
-      webhooks.verify({ body: `${body} `, signature, secret })
+      webhooks.constructEvent({ body: `${body} `, signature, secret })
     ).toThrow(rejection("InvalidWebhookSignatureError", "Signature mismatch"));
   });
 
   it("rejects a delivery signed with another secret", () => {
     const signature = sign({ body, secret: "whsec_other", timestamp: now() });
 
-    expect(() => webhooks.verify({ body, signature, secret })).toThrow(
+    expect(() => webhooks.constructEvent({ body, signature, secret })).toThrow(
       rejection("InvalidWebhookSignatureError", "Signature mismatch")
     );
   });
@@ -83,7 +89,9 @@ describe("Webhooks.verify", () => {
     const unknown = JSON.stringify({ type: "run.cancelled" });
     const signature = sign({ body: unknown, secret, timestamp: now() });
 
-    expect(() => webhooks.verify({ body: unknown, signature, secret })).toThrow(
+    expect(() =>
+      webhooks.constructEvent({ body: unknown, signature, secret })
+    ).toThrow(
       rejection("InvalidWebhookPayloadError", "Payload is not a known event")
     );
   });

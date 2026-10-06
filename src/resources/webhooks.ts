@@ -29,14 +29,14 @@ const Signature = z
   .pipe(z.object({ t: z.coerce.number().int(), v1: z.hex().length(64) }))
   .transform(({ t, v1 }) => ({ timestamp: t, digest: v1 }));
 
-export type VerifyParams = {
+export type ConstructEventParams = {
   body: string;
   signature: string | null;
   secret: string;
 };
 
 export class Webhooks {
-  public verify(params: VerifyParams): Event {
+  public constructEvent(params: ConstructEventParams): Event {
     const { body, signature, secret } = params;
 
     if (signature === null) {
