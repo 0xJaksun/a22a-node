@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "../../src/http";
 import {
-  type Deployment,
-  Deployments,
-  type Manifest
-} from "../../src/resources/deployments";
+  type Manifest,
+  type Project,
+  Projects
+} from "../../src/resources/projects";
 import { mockFetch, sentRequest } from "../helpers";
 
 const manifest: Manifest = {
   project: "acme",
-  flows: {
+  workflows: {
     summarise: {
       steps: [
         { id: "extract", prompt: "Pull the facts from {{input.text}}" },
@@ -23,13 +23,13 @@ const manifest: Manifest = {
   }
 };
 
-const mockDeployment: Deployment = {
+const mockProject: Project = {
   id: "1d4f6c3e-8a2b-4c7d-9e1f-0a1b2c3d4e5f",
   project: "acme",
   version: 2,
   manifest: {
     project: "acme",
-    flows: {
+    workflows: {
       summarise: {
         steps: [
           {
@@ -48,19 +48,17 @@ const mockDeployment: Deployment = {
   }
 };
 
-describe("Deployments.create", () => {
+describe("Projects.deploy", () => {
   it("POSTs the manifest to /v1/deploy and returns what was deployed", async () => {
     const api = vi.fn<(req: Request) => Response>(() =>
-      Response.json({ project: "acme", version: 2, flows: ["summarise"] })
+      Response.json({ project: "acme", version: 2, workflows: ["summarise"] })
     );
-    const deployments = new Deployments(
-      new HttpClient("key_1", mockFetch(api))
-    );
+    const projects = new Projects(new HttpClient("key_1", mockFetch(api)));
 
-    await expect(deployments.create(manifest)).resolves.toStrictEqual({
+    await expect(projects.deploy(manifest)).resolves.toStrictEqual({
       project: "acme",
       version: 2,
-      flows: ["summarise"]
+      workflows: ["summarise"]
     });
 
     const req = sentRequest(api);
@@ -72,7 +70,7 @@ describe("Deployments.create", () => {
   });
 
   it("rejects with BadRequestError when the manifest is invalid", async () => {
-    const deployments = new Deployments(
+    const projects = new Projects(
       new HttpClient(
         "key_1",
         mockFetch(() =>
@@ -81,40 +79,36 @@ describe("Deployments.create", () => {
       )
     );
 
-    await expect(deployments.create(manifest)).rejects.toMatchObject({
+    await expect(projects.deploy(manifest)).rejects.toMatchObject({
       type: "BadRequestError",
       status: 400,
       code: "invalid_structure"
     });
   });
 
-  it("rejects with InvalidResponseError when the body isn't a deployment", async () => {
-    const deployments = new Deployments(
+  it("rejects with InvalidResponseError when the body isn't what was deployed", async () => {
+    const projects = new Projects(
       new HttpClient(
         "key_1",
         mockFetch(() => Response.json({ ok: true }))
       )
     );
 
-    await expect(deployments.create(manifest)).rejects.toMatchObject({
+    await expect(projects.deploy(manifest)).rejects.toMatchObject({
       type: "InvalidResponseError",
       status: 200
     });
   });
 });
 
-describe("Deployments.retrieve", () => {
-  it("GETs /v1/deploy/:project and returns the deployment", async () => {
+describe("Projects.retrieve", () => {
+  it("GETs /v1/deploy/:project and returns the project", async () => {
     const api = vi.fn<(req: Request) => Response>(() =>
-      Response.json(mockDeployment)
+      Response.json(mockProject)
     );
-    const deployments = new Deployments(
-      new HttpClient("key_1", mockFetch(api))
-    );
+    const projects = new Projects(new HttpClient("key_1", mockFetch(api)));
 
-    await expect(deployments.retrieve("acme")).resolves.toStrictEqual(
-      mockDeployment
-    );
+    await expect(projects.retrieve("acme")).resolves.toStrictEqual(mockProject);
     expect(sentRequest(api)).toMatchObject({
       method: "GET",
       url: "https://api.a22a.dev/v1/deploy/acme"
@@ -122,29 +116,29 @@ describe("Deployments.retrieve", () => {
   });
 
   it("rejects with NotFoundError when the project doesn't exist", async () => {
-    const deployments = new Deployments(
+    const projects = new Projects(
       new HttpClient(
         "key_1",
         mockFetch(() => Response.json({ error: "not_found" }, { status: 404 }))
       )
     );
 
-    await expect(deployments.retrieve("nope")).rejects.toMatchObject({
+    await expect(projects.retrieve("nope")).rejects.toMatchObject({
       type: "NotFoundError",
       status: 404,
       code: "not_found"
     });
   });
 
-  it("rejects with InvalidResponseError when the body isn't a deployment", async () => {
-    const deployments = new Deployments(
+  it("rejects with InvalidResponseError when the body isn't a project", async () => {
+    const projects = new Projects(
       new HttpClient(
         "key_1",
         mockFetch(() => Response.json({ id: "x", project: "acme" }))
       )
     );
 
-    await expect(deployments.retrieve("acme")).rejects.toMatchObject({
+    await expect(projects.retrieve("acme")).rejects.toMatchObject({
       type: "InvalidResponseError",
       status: 200
     });

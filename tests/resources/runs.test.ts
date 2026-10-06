@@ -4,14 +4,18 @@ import { Runs } from "../../src/resources/runs";
 import { mockFetch, sentRequest } from "../helpers";
 
 describe("Runs.invoke", () => {
-  it("POSTs the input to /v1/run/:project/:flow and returns the run id", async () => {
+  it("POSTs the input to /v1/run/:project/:workflow and returns the run id", async () => {
     const api = vi.fn<(req: Request) => Response>(() =>
       Response.json({ run_id: "run_1" })
     );
     const runs = new Runs(new HttpClient("key_1", mockFetch(api)));
 
     await expect(
-      runs.invoke({ project: "acme", flow: "summarise", input: { text: "hi" } })
+      runs.invoke({
+        project: "acme",
+        workflow: "summarise",
+        input: { text: "hi" }
+      })
     ).resolves.toStrictEqual({ run_id: "run_1" });
 
     const req = sentRequest(api);
@@ -28,12 +32,12 @@ describe("Runs.invoke", () => {
     );
     const runs = new Runs(new HttpClient("key_1", mockFetch(api)));
 
-    await runs.invoke({ project: "acme", flow: "summarise" });
+    await runs.invoke({ project: "acme", workflow: "summarise" });
 
     await expect(sentRequest(api).json()).resolves.toStrictEqual({});
   });
 
-  it("rejects with NotFoundError when the flow doesn't exist", async () => {
+  it("rejects with NotFoundError when the workflow doesn't exist", async () => {
     const runs = new Runs(
       new HttpClient(
         "key_1",
@@ -42,7 +46,7 @@ describe("Runs.invoke", () => {
     );
 
     await expect(
-      runs.invoke({ project: "acme", flow: "nope" })
+      runs.invoke({ project: "acme", workflow: "nope" })
     ).rejects.toMatchObject({
       type: "NotFoundError",
       status: 404,
@@ -61,7 +65,7 @@ describe("Runs.invoke", () => {
     );
 
     await expect(
-      runs.invoke({ project: "acme", flow: "summarise", input: { x: 1 } })
+      runs.invoke({ project: "acme", workflow: "summarise", input: { x: 1 } })
     ).rejects.toMatchObject({
       type: "BadRequestError",
       status: 400,
@@ -78,7 +82,7 @@ describe("Runs.invoke", () => {
     );
 
     await expect(
-      runs.invoke({ project: "acme", flow: "summarise" })
+      runs.invoke({ project: "acme", workflow: "summarise" })
     ).rejects.toMatchObject({
       type: "InvalidResponseError",
       status: 200

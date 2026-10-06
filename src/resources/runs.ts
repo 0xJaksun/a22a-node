@@ -29,7 +29,7 @@ export type Run = z.infer<typeof Run>;
 
 export type InvokeParams = {
   project: string;
-  flow: string;
+  workflow: string;
   input?: Record<string, unknown>;
 };
 
@@ -37,8 +37,12 @@ export class Runs {
   constructor(private readonly http: HttpClient) {}
 
   public async invoke(params: InvokeParams): Promise<InvokedRun> {
-    const { project, flow, input } = params;
-    return this.http.post(`/v1/run/${project}/${flow}`, { input }, InvokedRun);
+    const { project, workflow, input } = params;
+    return this.http.post(
+      `/v1/run/${project}/${workflow}`,
+      { input },
+      InvokedRun
+    );
   }
 
   public async retrieve(id: string): Promise<Run> {

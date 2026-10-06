@@ -32,7 +32,7 @@ describe("HttpClient", () => {
     );
 
     await expect(
-      client.post("/v1/workflows/x/invoke", { input: { a: 1 } }, Echo)
+      client.post("/v1/run/acme/summarise", { input: { a: 1 } }, Echo)
     ).resolves.toStrictEqual({ input: { a: 1 } });
   });
 
