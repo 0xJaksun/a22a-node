@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { HttpClient } from "../../src/http";
 import { Deployments } from "../../src/resources/deployments";
-import { mockFetch } from "../helpers";
+import { mockFetch, sentRequest } from "../helpers";
 
 const mockDeployment = {
   id: "1d4f6c3e-8a2b-4c7d-9e1f-0a1b2c3d4e5f",
@@ -30,7 +30,9 @@ const mockDeployment = {
 
 describe("Deployments.retrieve", () => {
   it("GETs /v1/deploy/:project and returns the deployment", async () => {
-    const api = vi.fn(() => Response.json(mockDeployment));
+    const api = vi.fn<(req: Request) => Response>(() =>
+      Response.json(mockDeployment)
+    );
     const deployments = new Deployments(
       new HttpClient("key_1", mockFetch(api))
     );
@@ -38,12 +40,10 @@ describe("Deployments.retrieve", () => {
     await expect(deployments.retrieve("acme")).resolves.toStrictEqual(
       mockDeployment
     );
-    expect(api).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: "GET",
-        url: "https://api.a22a.dev/v1/deploy/acme"
-      })
-    );
+    expect(sentRequest(api)).toMatchObject({
+      method: "GET",
+      url: "https://api.a22a.dev/v1/deploy/acme"
+    });
   });
 
   it("rejects with NotFoundError when the project doesn't exist", async () => {

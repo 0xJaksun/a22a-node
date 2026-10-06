@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { A22A } from "../src/client";
 import { Deployments } from "../src/resources/deployments";
+import { Runs } from "../src/resources/runs";
 
 describe("A22A", () => {
   it("mounts the resources", () => {
     const a22a = new A22A({ apiKey: "key_1" });
 
     expect(a22a.deployments).toBeInstanceOf(Deployments);
+    expect(a22a.runs).toBeInstanceOf(Runs);
   });
 });
