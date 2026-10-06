@@ -1,7 +1,7 @@
 {
   "name": "a22a",
   "version": "0.0.0",
-  "description": "The official Node.js library for the a22a API. Lambdas for LLM workflows: deploy a JSON workflow, invoke it by name, get the run back.",
+  "description": "Node.js SDK for a22a, the hosted runner for multi-step LLM workflows.",
   "type": "module",
   "private": true,
   "license": "MIT",
@@ -17,7 +17,6 @@
     "ai",
     "workflow",
     "workflows",
-    "lambda",
     "serverless",
     "prompt chain",
     "agents",
