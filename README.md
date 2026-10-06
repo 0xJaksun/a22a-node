@@ -18,9 +18,9 @@ Node.js 20.19 or later.
 ## Installation
 
 ```sh
-npm install a22a
+npm install @a22a/sdk
 # or
-pnpm add a22a
+pnpm add @a22a/sdk
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ pnpm add a22a
 The package needs to be configured with your account's API key, which is available on the [A22A dashboard](https://a22a.sh).
 
 ```ts
-import { A22A } from "a22a";
+import { A22A } from "@a22a/sdk";
 
 const a22a = new A22A({ apiKey: "a22a_…" });
 
@@ -44,7 +44,7 @@ const { run_id } = await a22a.runs.invoke({
 Types are bundled. Request and response shapes are importable by name.
 
 ```ts
-import type { Manifest, Run, WebhookEvent } from "a22a";
+import type { Manifest, Run, WebhookEvent } from "@a22a/sdk";
 ```
 
 ## Deploying a project

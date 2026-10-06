@@ -1,5 +1,5 @@
 {
-  "name": "a22a",
+  "name": "@a22a/sdk",
   "version": "0.0.0",
   "description": "Node.js SDK for a22a, the hosted runner for multi-step LLM workflows.",
   "type": "module",
