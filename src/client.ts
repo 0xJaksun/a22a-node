@@ -1,3 +1,4 @@
+import * as Errors from "./error";
 import { HttpClient } from "./http";
 import { Projects } from "./resources/projects";
 import { Runs } from "./resources/runs";
@@ -8,6 +9,8 @@ export type ClientOptions = {
 };
 
 export class A22A {
+  static errors = Errors;
+
   readonly projects: Projects;
   readonly runs: Runs;
   readonly webhooks: Webhooks;
