@@ -85,3 +85,76 @@ describe("Runs.invoke", () => {
     });
   });
 });
+
+const mockFailedRun = {
+  run_id: "1d4f6c3e-8a2b-4c7d-9e1f-0a1b2c3d4e5f",
+  status: "failed",
+  error: "Step write failed",
+  steps: [
+    { step_id: "extract", status: "completed", output: "facts" },
+    { step_id: "write", status: "failed", error: "Insufficient credits" }
+  ]
+};
+
+const mockRunningRun = {
+  run_id: "2e5a7d4f-9b3c-4d8e-8f20-1b2c3d4e5f60",
+  status: "running",
+  steps: [
+    { step_id: "extract", status: "running" },
+    { step_id: "write", status: "pending" }
+  ]
+};
+
+describe("Runs.retrieve", () => {
+  it.each([mockFailedRun, mockRunningRun])(
+    "GETs /v1/runs/:id and returns a $status run with its steps",
+    async (mockRun) => {
+      const api = vi.fn<(req: Request) => Response>(() =>
+        Response.json(mockRun)
+      );
+      const runs = new Runs(new HttpClient("key_1", mockFetch(api)));
+
+      await expect(runs.retrieve(mockRun.run_id)).resolves.toStrictEqual(
+        mockRun
+      );
+      expect(sentRequest(api)).toMatchObject({
+        method: "GET",
+        url: `https://api.a22a.dev/v1/runs/${mockRun.run_id}`
+      });
+    }
+  );
+
+  it("rejects with NotFoundError when the run doesn't exist", async () => {
+    const runs = new Runs(
+      new HttpClient(
+        "key_1",
+        mockFetch(() => Response.json({ error: "not_found" }, { status: 404 }))
+      )
+    );
+
+    await expect(runs.retrieve("nope")).rejects.toMatchObject({
+      type: "NotFoundError",
+      status: 404,
+      code: "not_found"
+    });
+  });
+
+  it("rejects with InvalidResponseError when a step has an unknown status", async () => {
+    const runs = new Runs(
+      new HttpClient(
+        "key_1",
+        mockFetch(() =>
+          Response.json({
+            ...mockRunningRun,
+            steps: [{ step_id: "extract", status: "cancelled" }]
+          })
+        )
+      )
+    );
+
+    await expect(runs.retrieve(mockRunningRun.run_id)).rejects.toMatchObject({
+      type: "InvalidResponseError",
+      status: 200
+    });
+  });
+});
