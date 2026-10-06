@@ -43,6 +43,12 @@ describe("Webhooks.verify", () => {
     expect(webhooks.verify({ body, signature, secret })).toStrictEqual(event);
   });
 
+  it("rejects a missing header", () => {
+    expect(() => webhooks.verify({ body, signature: null, secret })).toThrow(
+      rejection("InvalidWebhookSignatureError", "Missing signature header")
+    );
+  });
+
   it("rejects a malformed header", () => {
     expect(() => webhooks.verify({ body, signature: "nope", secret })).toThrow(
       rejection("InvalidWebhookSignatureError", "Malformed signature header")

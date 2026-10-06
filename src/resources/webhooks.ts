@@ -31,7 +31,7 @@ const Signature = z
 
 export type VerifyParams = {
   body: string;
-  signature: string;
+  signature: string | null;
   secret: string;
 };
 
@@ -39,6 +39,9 @@ export class Webhooks {
   public verify(params: VerifyParams): Event {
     const { body, signature, secret } = params;
 
+    if (signature === null) {
+      throw new InvalidWebhookSignatureError("Missing signature header");
+    }
     const header = Signature.safeParse(signature);
     if (!header.success) {
       throw new InvalidWebhookSignatureError("Malformed signature header");
