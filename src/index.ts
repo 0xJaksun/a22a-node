@@ -1,6 +1,6 @@
 export { A22A, A22A as default, type ClientOptions } from "./client";
 
-export {
+export type {
   A22AError,
   APIConnectionError,
   APIError,

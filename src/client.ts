@@ -1,3 +1,15 @@
+import {
+  A22AError,
+  APIConnectionError,
+  APIError,
+  AuthenticationError,
+  BadRequestError,
+  InternalServerError,
+  InvalidResponseError,
+  InvalidWebhookPayloadError,
+  InvalidWebhookSignatureError,
+  NotFoundError
+} from "./error";
 import { HttpClient } from "./http";
 import { Projects } from "./resources/projects";
 import { Runs } from "./resources/runs";
@@ -8,6 +20,19 @@ export type ClientOptions = {
 };
 
 export class A22A {
+  static errors = {
+    A22AError,
+    APIError,
+    APIConnectionError,
+    AuthenticationError,
+    BadRequestError,
+    InternalServerError,
+    InvalidResponseError,
+    InvalidWebhookPayloadError,
+    InvalidWebhookSignatureError,
+    NotFoundError
+  };
+
   readonly projects: Projects;
   readonly runs: Runs;
   readonly webhooks: Webhooks;
