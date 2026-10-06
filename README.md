@@ -1,6 +1,4 @@
-<p align="center">
-  <img src=".github/logo.jpg" alt="A22A" width="480">
-</p>
+<img src=".github/logo.jpg" alt="A22A" width="100%">
 
 # A22A Node.js Library
 
