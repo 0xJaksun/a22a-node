@@ -13,6 +13,11 @@ describe("IO", () => {
       [["help"], { name: "help" }],
       [["list"], { name: "list", project: undefined }],
       [["list", "acme"], { name: "list", project: "acme" }],
+      [["deploy"], { name: "deploy", project: undefined, apiKey: undefined }],
+      [
+        ["deploy", "acme", "--api-key", "k"],
+        { name: "deploy", project: "acme", apiKey: "k" }
+      ],
       [["nope"], { name: "invalid", message: 'unknown command "nope"' }],
       [["--nope"], { name: "invalid", message: 'unknown option "--nope"' }],
       [["list", "-x"], { name: "invalid", message: 'unknown option "-x"' }]

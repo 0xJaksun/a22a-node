@@ -5,7 +5,8 @@ import { Projects } from "./cli/projects";
 
 const cli = new Cli({
   projects: new Projects(process.cwd()),
-  io: new IO(console)
+  io: new IO(console),
+  env: process.env
 });
 
 process.exitCode = await cli.run(process.argv.slice(2));

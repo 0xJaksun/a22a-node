@@ -68,4 +68,44 @@ describe("Projects", () => {
       error: "no a22a/ folder here"
     });
   });
+
+  describe("deploy", () => {
+    it("names the file that isn't JSON before sending anything", async () => {
+      const projects = new Projects(
+        await folder({ "a22a/acme/summarise.json": "{ steps: [" })
+      );
+
+      await expect(projects.deploy(undefined, "k")).resolves.toStrictEqual({
+        ok: false,
+        error: "a22a/acme/summarise.json: not valid JSON"
+      });
+    });
+
+    it("names the file and field that isn't a workflow", async () => {
+      const projects = new Projects(
+        await folder({
+          "a22a/acme/summarise.json": JSON.stringify({
+            steps: [{ id: "extract", prompt: 1 }]
+          })
+        })
+      );
+
+      await expect(projects.deploy(undefined, "k")).resolves.toStrictEqual({
+        ok: false,
+        error:
+          "a22a/acme/summarise.json: ✖ Invalid input: expected string, received number\n  → at steps[0].prompt"
+      });
+    });
+
+    it("refuses a project with no workflows", async () => {
+      const projects = new Projects(
+        await folder({ "a22a/empty/notes.txt": "" })
+      );
+
+      await expect(projects.deploy("empty", "k")).resolves.toStrictEqual({
+        ok: false,
+        error: "a22a/empty: no workflows"
+      });
+    });
+  });
 });
