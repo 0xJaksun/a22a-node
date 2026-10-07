@@ -7,11 +7,13 @@ export type Command =
   | { name: "version" }
   | { name: "help" }
   | { name: "list"; project?: string }
+  | { name: "deploy"; project?: string; apiKey?: string }
   | { name: "invalid"; message: string };
 
 const OPTIONS = {
   version: { type: "boolean", short: "v" },
-  help: { type: "boolean", short: "h" }
+  help: { type: "boolean", short: "h" },
+  "api-key": { type: "string" }
 } satisfies ParseArgsConfig["options"];
 
 export class IO {
@@ -26,10 +28,9 @@ export class IO {
       tokens: true
     });
 
-    const option = tokens
-      .filter((token) => token.kind === "option")
-      .find((token) => !(token.name in OPTIONS));
-    if (option) return this.invalid(`unknown option "${option.rawName}"`);
+    const options = tokens.filter((token) => token.kind === "option");
+    const unknown = options.find((option) => !(option.name in OPTIONS));
+    if (unknown) return this.invalid(`unknown option "${unknown.rawName}"`);
 
     if (values.version) return { name: "version" };
     if (values.help) return { name: "help" };
@@ -40,6 +41,12 @@ export class IO {
         return { name: "help" };
       case "list":
         return { name: "list", project };
+      case "deploy":
+        return {
+          name: "deploy",
+          project,
+          apiKey: options.find((option) => option.name === "api-key")?.value
+        };
       default:
         return this.invalid(`unknown command "${command}"`);
     }
