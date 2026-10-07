@@ -25,8 +25,8 @@ export class Cli {
         return 0;
       case "list":
         return io.result(await projects.list(command.project));
-      case "unknown":
-        io.err(`unknown command "${command.command}"`);
+      case "invalid":
+        io.err(command.message);
         io.out(USAGE);
         return 2;
     }

@@ -1,4 +1,4 @@
-import { parseArgs } from "node:util";
+import { type ParseArgsConfig, parseArgs } from "node:util";
 import type { Result } from "./result";
 
 export type Output = Pick<Console, "log" | "error">;
@@ -7,20 +7,29 @@ export type Command =
   | { name: "version" }
   | { name: "help" }
   | { name: "list"; project?: string }
-  | { name: "unknown"; command: string };
+  | { name: "invalid"; message: string };
+
+const OPTIONS = {
+  version: { type: "boolean", short: "v" },
+  help: { type: "boolean", short: "h" }
+} satisfies ParseArgsConfig["options"];
 
 export class IO {
   constructor(private readonly output: Output) {}
 
   public parse(args: string[]): Command {
-    const { values, positionals } = parseArgs({
+    const { values, positionals, tokens } = parseArgs({
       args,
-      options: {
-        version: { type: "boolean", short: "v" },
-        help: { type: "boolean", short: "h" }
-      },
-      allowPositionals: true
+      options: OPTIONS,
+      allowPositionals: true,
+      strict: false,
+      tokens: true
     });
+
+    const option = tokens
+      .filter((token) => token.kind === "option")
+      .find((token) => !(token.name in OPTIONS));
+    if (option) return this.invalid(`unknown option "${option.rawName}"`);
 
     if (values.version) return { name: "version" };
     if (values.help) return { name: "help" };
@@ -32,8 +41,12 @@ export class IO {
       case "list":
         return { name: "list", project };
       default:
-        return { name: "unknown", command };
+        return this.invalid(`unknown command "${command}"`);
     }
+  }
+
+  private invalid(message: string): Command {
+    return { name: "invalid", message };
   }
 
   public out(text: string): void {

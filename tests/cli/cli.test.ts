@@ -32,7 +32,7 @@ describe("Cli", () => {
     expect(stderr).toStrictEqual([]);
   });
 
-  it("fails on an unknown command and shows usage", async () => {
+  it("fails on an invalid command line and shows usage", async () => {
     const { run, stdout, stderr } = await cli();
 
     await expect(run(["nope"])).resolves.toBe(2);
