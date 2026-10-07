@@ -1,7 +1,11 @@
 #!/usr/bin/env node
-import { run } from "./cli";
+import { Cli } from "./cli/cli";
+import { IO } from "./cli/io";
+import { Projects } from "./cli/projects";
 
-process.exitCode = await run(process.argv.slice(2), {
-  out: (line) => console.log(line),
-  err: (line) => console.error(line)
+const cli = new Cli({
+  projects: new Projects(process.cwd()),
+  io: new IO(console)
 });
+
+process.exitCode = await cli.run(process.argv.slice(2));
