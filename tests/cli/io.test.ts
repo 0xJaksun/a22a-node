@@ -13,7 +13,9 @@ describe("IO", () => {
       [["help"], { name: "help" }],
       [["list"], { name: "list", project: undefined }],
       [["list", "acme"], { name: "list", project: "acme" }],
-      [["nope"], { name: "unknown", command: "nope" }]
+      [["nope"], { name: "invalid", message: 'unknown command "nope"' }],
+      [["--nope"], { name: "invalid", message: 'unknown option "--nope"' }],
+      [["list", "-x"], { name: "invalid", message: 'unknown option "-x"' }]
     ])("%j", (args, command) => {
       expect(new IO(output()).parse(args)).toStrictEqual(command);
     });

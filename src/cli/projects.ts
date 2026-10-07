@@ -14,13 +14,11 @@ export class Projects {
     if (projects === null) {
       return { ok: false, error: `no ${DIR}/ folder here` };
     }
+    if (only !== undefined && projects.length === 0) {
+      return { ok: false, error: `no project "${only}" under ${DIR}/` };
+    }
 
-    return {
-      ok: true,
-      value: projects.map(
-        ({ project, workflows }) => `${project}: ${workflows.join(", ")}`
-      )
-    };
+    return { ok: true, value: projects.map((project) => this.line(project)) };
   }
 
   private async find(only?: string): Promise<Project[] | null> {
@@ -28,7 +26,7 @@ export class Projects {
     if (names === null) return null;
 
     const wanted = names
-      .filter((name) => only === undefined || name === only)
+      .filter((name) => !name.startsWith(".") && (only ?? name) === name)
       .sort();
     const projects = await Promise.all(
       wanted.map((project) => this.read(project))
@@ -43,6 +41,11 @@ export class Projects {
       project,
       workflows: files.filter((name) => name.endsWith(".json")).sort()
     };
+  }
+
+  private line({ project, workflows }: Project): string {
+    const list = workflows.length === 0 ? "no workflows" : workflows.join(", ");
+    return `${project}: ${list}`;
   }
 
   private async entries(dir: string): Promise<string[] | null> {
