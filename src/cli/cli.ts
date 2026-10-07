@@ -1,12 +1,13 @@
 import { VERSION } from "../version";
 import type { IO } from "./io";
-import { DIR, type Projects } from "./projects";
+import { DIR, Projects } from "./projects";
 
 const USAGE = `usage: a22a <command>
 
   list [project]     list every project under ./${DIR}/ and its workflows, or the one named
   deploy [project]   deploy every project under ./${DIR}/, or the one named
 
+  --dir <path>       the projects folder, default ./${DIR}
   --api-key <key>    for deploy, else A22A_API_KEY
   -v, --version
   -h, --help`;
@@ -14,12 +15,10 @@ const USAGE = `usage: a22a <command>
 export type Env = { A22A_API_KEY?: string };
 
 export class Cli {
-  constructor(
-    private readonly deps: { projects: Projects; io: IO; env: Env }
-  ) {}
+  constructor(private readonly deps: { io: IO; env: Env; cwd: string }) {}
 
   public async run(args: string[]): Promise<number> {
-    const { projects, io, env } = this.deps;
+    const { io, env } = this.deps;
     const command = io.parse(args);
 
     switch (command.name) {
@@ -30,17 +29,25 @@ export class Cli {
         io.out(USAGE);
         return 0;
       case "list":
-        return io.result(await projects.list(command.project));
+        return io.result(
+          await this.projects(command.dir).list(command.project)
+        );
       case "deploy": {
         const apiKey = command.apiKey ?? env.A22A_API_KEY;
         if (apiKey === undefined) {
           return this.usage("no api key: pass --api-key or set A22A_API_KEY");
         }
-        return io.result(await projects.deploy(command.project, apiKey));
+        return io.result(
+          await this.projects(command.dir).deploy(command.project, apiKey)
+        );
       }
       case "invalid":
         return this.usage(command.message);
     }
+  }
+
+  private projects(dir = DIR): Projects {
+    return new Projects(this.deps.cwd, dir);
   }
 
   /** The problem, then how to call us. */

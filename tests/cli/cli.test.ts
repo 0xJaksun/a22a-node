@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { Cli, type Env } from "../../src/cli/cli";
 import { IO } from "../../src/cli/io";
-import { Projects } from "../../src/cli/projects";
 import { VERSION } from "../../src/version";
-import { folder, output } from "./folder";
+import { folder, output } from "./helpers";
 
 async function cli(files: Record<string, string> = {}, env: Env = {}) {
   const out = output();
   const instance = new Cli({
-    projects: new Projects(await folder(files)),
     io: new IO(out),
-    env
+    env,
+    cwd: await folder(files)
   });
   return { ...out, run: (args: string[]) => instance.run(args) };
 }
@@ -33,14 +32,23 @@ describe("Cli", () => {
     expect(stderr).toStrictEqual([]);
   });
 
-  it("deploys with the key from the flag", async () => {
+  it("reads the folder given by --dir", async () => {
+    const { run, stdout } = await cli({
+      "workflows/acme/summarise.json": "{}"
+    });
+
+    await expect(run(["list", "--dir", "workflows"])).resolves.toBe(0);
+    expect(stdout).toStrictEqual(["acme: summarise.json"]);
+  });
+
+  it("accepts the key from the flag", async () => {
     const { run, stderr } = await cli();
 
     await expect(run(["deploy", "--api-key", "k"])).resolves.toBe(2);
     expect(stderr).toStrictEqual(["a22a: no a22a/ folder here"]);
   });
 
-  it("deploys with the key from the environment", async () => {
+  it("accepts the key from the environment", async () => {
     const { run, stderr } = await cli({}, { A22A_API_KEY: "k" });
 
     await expect(run(["deploy"])).resolves.toBe(2);
