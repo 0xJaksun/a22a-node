@@ -31,11 +31,14 @@
   },
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "a22a": "./dist/bin.js"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean",
+    "build": "tsup src/index.ts src/bin.ts --format esm --dts --clean",
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
