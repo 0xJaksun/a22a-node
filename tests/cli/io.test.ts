@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { IO } from "../../src/cli/io";
-import { output } from "./folder";
+import { output } from "./helpers";
 
 describe("IO", () => {
   describe("parse", () => {
@@ -11,16 +11,37 @@ describe("IO", () => {
       [["-h"], { name: "help" }],
       [[], { name: "help" }],
       [["help"], { name: "help" }],
-      [["list"], { name: "list", project: undefined }],
-      [["list", "acme"], { name: "list", project: "acme" }],
-      [["deploy"], { name: "deploy", project: undefined, apiKey: undefined }],
+      [["list"], { name: "list", project: undefined, dir: undefined }],
+      [["list", "acme"], { name: "list", project: "acme", dir: undefined }],
       [
-        ["deploy", "acme", "--api-key", "k"],
-        { name: "deploy", project: "acme", apiKey: "k" }
+        ["list", "--dir", "workflows"],
+        { name: "list", project: undefined, dir: "workflows" }
+      ],
+      [
+        ["deploy"],
+        {
+          name: "deploy",
+          project: undefined,
+          dir: undefined,
+          apiKey: undefined
+        }
+      ],
+      [
+        ["deploy", "acme", "--dir", "workflows", "--api-key", "k"],
+        { name: "deploy", project: "acme", dir: "workflows", apiKey: "k" }
       ],
       [["nope"], { name: "invalid", message: 'unknown command "nope"' }],
       [["--nope"], { name: "invalid", message: 'unknown option "--nope"' }],
-      [["list", "-x"], { name: "invalid", message: 'unknown option "-x"' }]
+      [["list", "-x"], { name: "invalid", message: 'unknown option "-x"' }],
+      [["list", "--dir"], { name: "invalid", message: "--dir needs a value" }],
+      [
+        ["list", "--dir", ""],
+        { name: "invalid", message: "--dir needs a value" }
+      ],
+      [
+        ["deploy", "--api-key"],
+        { name: "invalid", message: "--api-key needs a value" }
+      ]
     ])("%j", (args, command) => {
       expect(new IO(output()).parse(args)).toStrictEqual(command);
     });
