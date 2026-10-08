@@ -13,7 +13,8 @@ interface IHttpClient {
 export class HttpClient implements IHttpClient {
   constructor(
     private readonly apiKey: string,
-    private readonly fetch: typeof globalThis.fetch = globalThis.fetch
+    private readonly fetch: typeof globalThis.fetch = globalThis.fetch,
+    readonly baseURL: string = BASE_URL
   ) {}
 
   public async get<T>(path: string, response: z.ZodType<T>): Promise<T> {
@@ -63,7 +64,7 @@ export class HttpClient implements IHttpClient {
     body?: string
   ): Promise<Response> {
     try {
-      return await this.fetch(new URL(path, BASE_URL), {
+      return await this.fetch(new URL(path, this.baseURL), {
         method,
         body,
         headers: {

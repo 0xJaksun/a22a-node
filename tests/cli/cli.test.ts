@@ -41,11 +41,14 @@ describe("Cli", () => {
     expect(stdout).toStrictEqual(["acme: summarise.json"]);
   });
 
-  it("accepts the key from the flag", async () => {
-    const { run, stderr } = await cli();
+  it("reads the folder named by A22A_DIR", async () => {
+    const { run, stdout } = await cli(
+      { "workflows/acme/summarise.json": "{}" },
+      { A22A_DIR: "workflows" }
+    );
 
-    await expect(run(["deploy", "--api-key", "k"])).resolves.toBe(2);
-    expect(stderr).toStrictEqual(["a22a: no a22a/ folder here"]);
+    await expect(run(["list"])).resolves.toBe(0);
+    expect(stdout).toStrictEqual(["acme: summarise.json"]);
   });
 
   it("accepts the key from the environment", async () => {
@@ -59,10 +62,8 @@ describe("Cli", () => {
     const { run, stdout, stderr } = await cli();
 
     await expect(run(["deploy"])).resolves.toBe(2);
-    expect(stderr).toStrictEqual([
-      "a22a: no api key: pass --api-key or set A22A_API_KEY"
-    ]);
-    expect(stdout[0]).toMatch(/^usage: a22a <command>/);
+    expect(stderr).toStrictEqual(["a22a: no api key: set A22A_API_KEY"]);
+    expect(stdout).toStrictEqual([]);
   });
 
   it("fails on an invalid command line and shows usage", async () => {

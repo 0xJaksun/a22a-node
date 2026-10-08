@@ -1,3 +1,4 @@
+import { A22A } from "../client";
 import { VERSION } from "../version";
 import type { IO } from "./io";
 import { DIR, Projects } from "./projects";
@@ -8,18 +9,32 @@ const USAGE = `usage: a22a <command>
   deploy [project]   deploy every project under ./${DIR}/, or the one named
 
   --dir <path>       the projects folder, default ./${DIR}
-  --api-key <key>    for deploy, else A22A_API_KEY
   -v, --version
-  -h, --help`;
+  -h, --help
 
-export type Env = { A22A_API_KEY?: string };
+  A22A_API_KEY       needed by deploy
+  A22A_DIR           the projects folder when --dir isn't given`;
+
+export type Env = {
+  A22A_API_KEY?: string;
+  A22A_BASE_URL?: string;
+  A22A_DIR?: string;
+};
 
 export class Cli {
-  constructor(private readonly deps: { io: IO; env: Env; cwd: string }) {}
+  private readonly a22a?: A22A;
+  private readonly dir: string;
+
+  constructor(private readonly deps: { io: IO; env: Env; cwd: string }) {
+    const { A22A_API_KEY: apiKey, A22A_BASE_URL: baseURL } = deps.env;
+    if (apiKey !== undefined) this.a22a = new A22A({ apiKey, baseURL });
+    this.dir = deps.env.A22A_DIR ?? DIR;
+  }
 
   public async run(args: string[]): Promise<number> {
-    const { io, env } = this.deps;
-    const command = io.parse(args);
+    const { io, cwd } = this.deps;
+    const { command, dir = this.dir } = io.parse(args);
+    const projects = new Projects(cwd, dir, this.a22a);
 
     switch (command.name) {
       case "version":
@@ -29,25 +44,12 @@ export class Cli {
         io.out(USAGE);
         return 0;
       case "list":
-        return io.result(
-          await this.projects(command.dir).list(command.project)
-        );
-      case "deploy": {
-        const apiKey = command.apiKey ?? env.A22A_API_KEY;
-        if (apiKey === undefined) {
-          return this.usage("no api key: pass --api-key or set A22A_API_KEY");
-        }
-        return io.result(
-          await this.projects(command.dir).deploy(command.project, apiKey)
-        );
-      }
+        return io.result(await projects.list(command.project));
+      case "deploy":
+        return io.result(await projects.deploy(command.project));
       case "invalid":
         return this.usage(command.message);
     }
-  }
-
-  private projects(dir = DIR): Projects {
-    return new Projects(this.deps.cwd, dir);
   }
 
   /** The problem, then how to call us. */

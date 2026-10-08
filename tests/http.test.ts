@@ -25,6 +25,18 @@ describe("HttpClient", () => {
     });
   });
 
+  it("sends to the base url it is given", async () => {
+    const client = new HttpClient(
+      "key_1",
+      mockFetch((req) => Response.json({ url: req.url })),
+      "http://localhost:8888"
+    );
+
+    await expect(client.get("/v1/runs/run_1", Echo)).resolves.toMatchObject({
+      url: "http://localhost:8888/v1/runs/run_1"
+    });
+  });
+
   it("posts the body as JSON", async () => {
     const client = new HttpClient(
       "key_1",

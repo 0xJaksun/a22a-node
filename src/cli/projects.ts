@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { z } from "zod";
-import { A22A } from "../client";
+import type { A22A } from "../client";
 import { A22AError } from "../error";
 import type { Manifest } from "../resources/projects";
 import type { Result } from "./result";
@@ -27,7 +27,8 @@ const WorkflowSchema = z.strictObject({
 export class Projects {
   constructor(
     private readonly cwd: string,
-    private readonly dir: string
+    private readonly dir: string,
+    private readonly a22a?: A22A
   ) {}
 
   public async list(only?: string): Promise<Result<string[], string>> {
@@ -41,10 +42,15 @@ export class Projects {
     return { ok: true, value };
   }
 
-  public async deploy(
-    only: string | undefined,
-    apiKey: string
-  ): Promise<Result<string[], string>> {
+  public async deploy(only?: string): Promise<Result<string[], string>> {
+    const { a22a } = this;
+    if (a22a === undefined) {
+      return {
+        ok: false,
+        error: "no api key: set A22A_API_KEY"
+      };
+    }
+
     const projects = await this.find(only);
     if (!projects.ok) return projects;
 
@@ -55,19 +61,33 @@ export class Projects {
       manifests.push(manifest.value);
     }
 
-    const api = new A22A({ apiKey });
-    const value: string[] = [];
+    const value = ["Deployed:"];
     for (const manifest of manifests) {
       try {
         const { project, version, workflows } =
-          await api.projects.deploy(manifest);
-        value.push(`${project} v${version}: ${workflows.join(", ")}`);
+          await a22a.projects.deploy(manifest);
+        value.push(
+          `  ${project} v${version}`,
+          ...this.endpoints(a22a.baseURL, project, workflows)
+        );
       } catch (error) {
         if (!(error instanceof A22AError)) throw error;
         return { ok: false, error: `${manifest.project}: ${error.message}` };
       }
     }
     return { ok: true, value };
+  }
+
+  private endpoints(
+    baseURL: string,
+    project: string,
+    workflows: string[]
+  ): string[] {
+    const width = Math.max(...workflows.map((workflow) => workflow.length));
+    return workflows.map(
+      (workflow) =>
+        `    ${workflow.padEnd(width)}   POST ${baseURL}/v1/run/${project}/${workflow}`
+    );
   }
 
   private async find(only?: string): Promise<Result<Project[], string>> {

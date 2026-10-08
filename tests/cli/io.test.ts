@@ -11,25 +11,10 @@ describe("IO", () => {
       [["-h"], { name: "help" }],
       [[], { name: "help" }],
       [["help"], { name: "help" }],
-      [["list"], { name: "list", project: undefined, dir: undefined }],
-      [["list", "acme"], { name: "list", project: "acme", dir: undefined }],
-      [
-        ["list", "--dir", "workflows"],
-        { name: "list", project: undefined, dir: "workflows" }
-      ],
-      [
-        ["deploy"],
-        {
-          name: "deploy",
-          project: undefined,
-          dir: undefined,
-          apiKey: undefined
-        }
-      ],
-      [
-        ["deploy", "acme", "--dir", "workflows", "--api-key", "k"],
-        { name: "deploy", project: "acme", dir: "workflows", apiKey: "k" }
-      ],
+      [["list"], { name: "list", project: undefined }],
+      [["list", "acme"], { name: "list", project: "acme" }],
+      [["deploy"], { name: "deploy", project: undefined }],
+      [["deploy", "acme"], { name: "deploy", project: "acme" }],
       [["nope"], { name: "invalid", message: 'unknown command "nope"' }],
       [["--nope"], { name: "invalid", message: 'unknown option "--nope"' }],
       [["list", "-x"], { name: "invalid", message: 'unknown option "-x"' }],
@@ -37,13 +22,18 @@ describe("IO", () => {
       [
         ["list", "--dir", ""],
         { name: "invalid", message: "--dir needs a value" }
-      ],
-      [
-        ["deploy", "--api-key"],
-        { name: "invalid", message: "--api-key needs a value" }
       ]
     ])("%j", (args, command) => {
-      expect(new IO(output()).parse(args)).toStrictEqual(command);
+      expect(new IO(output()).parse(args).command).toStrictEqual(command);
+    });
+
+    it("keeps --dir beside the command", () => {
+      expect(
+        new IO(output()).parse(["deploy", "acme", "--dir", "w"])
+      ).toStrictEqual({
+        command: { name: "deploy", project: "acme" },
+        dir: "w"
+      });
     });
   });
 

@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { Projects } from "../../src/cli/projects";
+import { A22A } from "../../src/client";
 import { folder } from "./helpers";
 
 /** Projects over the given files, read from a22a/ unless told otherwise. */
+const a22a = new A22A({ apiKey: "k", baseURL: "http://localhost:1" });
+
 async function projects(files: Record<string, string>, dir = "a22a") {
-  return new Projects(await folder(files), dir);
+  return new Projects(await folder(files), dir, a22a);
 }
 
 describe("Projects", () => {
@@ -81,12 +84,21 @@ describe("Projects", () => {
   });
 
   describe("deploy", () => {
+    it("refuses without a client", async () => {
+      const subject = new Projects(await folder({}), "a22a");
+
+      await expect(subject.deploy()).resolves.toStrictEqual({
+        ok: false,
+        error: "no api key: set A22A_API_KEY"
+      });
+    });
+
     it("names the file that isn't JSON before sending anything", async () => {
       const subject = await projects({
         "a22a/acme/summarise.json": "{ steps: ["
       });
 
-      await expect(subject.deploy(undefined, "k")).resolves.toStrictEqual({
+      await expect(subject.deploy()).resolves.toStrictEqual({
         ok: false,
         error: "a22a/acme/summarise.json: not valid JSON"
       });
@@ -95,7 +107,7 @@ describe("Projects", () => {
     it("names the file it cannot read", async () => {
       const subject = await projects({ "a22a/acme/summarise.json/inner": "" });
 
-      await expect(subject.deploy(undefined, "k")).resolves.toStrictEqual({
+      await expect(subject.deploy()).resolves.toStrictEqual({
         ok: false,
         error: "a22a/acme/summarise.json: cannot read"
       });
@@ -108,7 +120,7 @@ describe("Projects", () => {
         })
       });
 
-      await expect(subject.deploy(undefined, "k")).resolves.toStrictEqual({
+      await expect(subject.deploy()).resolves.toStrictEqual({
         ok: false,
         error:
           "a22a/acme/summarise.json: ✖ Invalid input: expected string, received number\n  → at steps[0].prompt"
@@ -118,7 +130,7 @@ describe("Projects", () => {
     it("refuses a project name the API would", async () => {
       const subject = await projects({ "a22a/Bad Name/run.json": "{}" });
 
-      await expect(subject.deploy(undefined, "k")).resolves.toStrictEqual({
+      await expect(subject.deploy()).resolves.toStrictEqual({
         ok: false,
         error:
           "a22a/Bad Name: project name must be lowercase letters, digits and dashes, up to 32"
@@ -128,7 +140,7 @@ describe("Projects", () => {
     it("refuses a workflow name the API would", async () => {
       const subject = await projects({ "a22a/acme/My Flow.json": "{}" });
 
-      await expect(subject.deploy(undefined, "k")).resolves.toStrictEqual({
+      await expect(subject.deploy()).resolves.toStrictEqual({
         ok: false,
         error:
           "a22a/acme/My Flow.json: workflow name must be lowercase letters, digits and dashes, up to 32"
@@ -138,7 +150,7 @@ describe("Projects", () => {
     it("refuses a project with no workflows", async () => {
       const subject = await projects({ "a22a/empty/notes.txt": "" });
 
-      await expect(subject.deploy("empty", "k")).resolves.toStrictEqual({
+      await expect(subject.deploy("empty")).resolves.toStrictEqual({
         ok: false,
         error: "a22a/empty: no workflows"
       });
