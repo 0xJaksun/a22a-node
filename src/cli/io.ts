@@ -6,14 +6,16 @@ export type Output = Pick<Console, "log" | "error">;
 export type Command =
   | { name: "version" }
   | { name: "help" }
-  | { name: "list"; project?: string; dir?: string }
-  | { name: "deploy"; project?: string; dir?: string; apiKey?: string }
+  | { name: "list"; project?: string }
+  | { name: "deploy"; project?: string }
   | { name: "invalid"; message: string };
+
+/** The command, and the options that apply to any command. */
+export type Parsed = { command: Command; dir?: string };
 
 const OPTIONS = {
   version: { type: "boolean", short: "v" },
   help: { type: "boolean", short: "h" },
-  "api-key": { type: "string" },
   dir: { type: "string" }
 } satisfies ParseArgsConfig["options"];
 
@@ -24,7 +26,7 @@ const STRING_OPTIONS = Object.entries(OPTIONS)
 export class IO {
   constructor(private readonly output: Output) {}
 
-  public parse(args: string[]): Command {
+  public parse(args: string[]): Parsed {
     const { positionals, tokens } = parseArgs({
       args,
       options: OPTIONS,
@@ -41,34 +43,29 @@ export class IO {
     );
     if (bare) return this.invalid(`${bare.rawName} needs a value`);
 
+    const dir = options.find((option) => option.name === "dir")?.value;
     if (options.some((option) => option.name === "version")) {
-      return { name: "version" };
+      return { command: { name: "version" }, dir };
     }
     if (options.some((option) => option.name === "help")) {
-      return { name: "help" };
+      return { command: { name: "help" }, dir };
     }
 
     const [command = "help", project] = positionals;
-    const dir = options.find((option) => option.name === "dir")?.value;
     switch (command) {
       case "help":
-        return { name: "help" };
+        return { command: { name: "help" }, dir };
       case "list":
-        return { name: "list", project, dir };
+        return { command: { name: "list", project }, dir };
       case "deploy":
-        return {
-          name: "deploy",
-          project,
-          dir,
-          apiKey: options.find((option) => option.name === "api-key")?.value
-        };
+        return { command: { name: "deploy", project }, dir };
       default:
         return this.invalid(`unknown command "${command}"`);
     }
   }
 
-  private invalid(message: string): Command {
-    return { name: "invalid", message };
+  private invalid(message: string): Parsed {
+    return { command: { name: "invalid", message } };
   }
 
   public out(text: string): void {

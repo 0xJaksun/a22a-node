@@ -12,4 +12,11 @@ describe("A22A", () => {
     expect(a22a.runs).toBeInstanceOf(Runs);
     expect(a22a.webhooks).toBeInstanceOf(Webhooks);
   });
+
+  it("points at the API unless told otherwise", () => {
+    expect(new A22A({ apiKey: "key_1" }).baseURL).toBe("https://api.a22a.sh");
+    expect(
+      new A22A({ apiKey: "key_1", baseURL: "http://localhost:8888" }).baseURL
+    ).toBe("http://localhost:8888");
+  });
 });
