@@ -116,7 +116,7 @@ describe("Projects", () => {
     it("names the file and field that isn't a workflow", async () => {
       const subject = await projects({
         "a22a/acme/summarise.json": JSON.stringify({
-          steps: [{ id: "extract", prompt: 1 }]
+          steps: [{ id: "extract", prompt: 1, model: "openai/gpt-5-nano" }]
         })
       });
 
@@ -124,6 +124,20 @@ describe("Projects", () => {
         ok: false,
         error:
           "a22a/acme/summarise.json: ✖ Invalid input: expected string, received number\n  → at steps[0].prompt"
+      });
+    });
+
+    it("names the step with no model", async () => {
+      const subject = await projects({
+        "a22a/acme/summarise.json": JSON.stringify({
+          steps: [{ id: "extract", prompt: "p" }]
+        })
+      });
+
+      await expect(subject.deploy()).resolves.toStrictEqual({
+        ok: false,
+        error:
+          "a22a/acme/summarise.json: ✖ Invalid input: expected string, received undefined\n  → at steps[0].model"
       });
     });
 

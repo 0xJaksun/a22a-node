@@ -12,9 +12,14 @@ const manifest: Manifest = {
   workflows: {
     summarise: {
       steps: [
-        { id: "extract", prompt: "Pull the facts from {{input.text}}" },
+        {
+          id: "extract",
+          model: "openai/gpt-5-nano",
+          prompt: "Pull the facts from {{input.text}}"
+        },
         {
           id: "write",
+          model: "openai/gpt-5-nano",
           prompt: "Summarise {{extract.output}}",
           needs: ["extract"]
         }
@@ -34,11 +39,13 @@ const mockProject: Project = {
         steps: [
           {
             id: "extract",
+            model: "openai/gpt-5-nano",
             prompt: "Pull the facts from {{input.text}}",
             needs: []
           },
           {
             id: "write",
+            model: "openai/gpt-5-nano",
             prompt: "Summarise {{extract.output}}",
             needs: ["extract"]
           }

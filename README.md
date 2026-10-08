@@ -49,7 +49,7 @@ import type { Manifest, Run, WebhookEvent } from "@a22a/sdk";
 
 ## Deploying a project
 
-A project is a set of named workflows. A workflow is a list of steps. A step is a prompt. Deploy them together as one document; each deploy creates a new version, and runs in progress stay on the version they started with.
+A project is a set of named workflows. A workflow is a list of steps. A step is a prompt and the model that answers it. Deploy them together as one document; each deploy creates a new version, and runs in progress stay on the version they started with.
 
 ```ts
 await a22a.projects.deploy({
@@ -57,10 +57,15 @@ await a22a.projects.deploy({
   workflows: {
     summarise: {
       steps: [
-        { id: "extract", prompt: "Pull the key facts from {{input.text}}" },
+        {
+          id: "extract",
+          prompt: "Pull the key facts from {{input.text}}",
+          model: "anthropic/claude-haiku-4.5"
+        },
         {
           id: "write",
           prompt: "Write a summary from {{extract.output}}",
+          model: "anthropic/claude-sonnet-5",
           needs: ["extract"]
         }
       ]
@@ -76,6 +81,7 @@ Prompts read the run's input with `{{input.<field>}}` and an earlier step's outp
 {
   id: "extract",
   prompt: "Pull the key facts from {{input.text}}",
+  model: "anthropic/claude-haiku-4.5",
   output: { title: "string", facts: "string[]" }
 }
 ```
