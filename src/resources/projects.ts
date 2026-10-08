@@ -14,6 +14,7 @@ const ProjectSchema = z.object({
           z.object({
             id: z.string(),
             prompt: z.string(),
+            model: z.string(),
             needs: z.array(z.string()),
             output: z.record(z.string(), z.unknown()).optional()
           })
@@ -41,6 +42,7 @@ export type Manifest = {
       steps: {
         id: string;
         prompt: string;
+        model: string;
         needs?: string[];
         output?: Record<string, unknown>;
       }[];
