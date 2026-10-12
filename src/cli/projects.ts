@@ -19,6 +19,7 @@ const WorkflowSchema = z.strictObject({
       id: z.string(),
       prompt: z.string(),
       model: z.string().min(1),
+      retries: z.number().int().min(0).max(5).optional(),
       needs: z.array(z.string()).optional(),
       output: z.record(z.string(), z.unknown()).optional()
     })

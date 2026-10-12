@@ -15,6 +15,7 @@ const ProjectSchema = z.object({
             id: z.string(),
             prompt: z.string(),
             model: z.string(),
+            retries: z.number().int(),
             needs: z.array(z.string()),
             output: z.record(z.string(), z.unknown()).optional()
           })
@@ -43,6 +44,8 @@ export type Manifest = {
         id: string;
         prompt: string;
         model: string;
+        /** More attempts after a failure that could have been transient. Default 2, max 5. */
+        retries?: number;
         needs?: string[];
         output?: Record<string, unknown>;
       }[];
