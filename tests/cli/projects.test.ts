@@ -127,6 +127,27 @@ describe("Projects", () => {
       });
     });
 
+    it("names the step asking for too many retries", async () => {
+      const subject = await projects({
+        "a22a/acme/summarise.json": JSON.stringify({
+          steps: [
+            {
+              id: "extract",
+              prompt: "p",
+              model: "openai/gpt-5-nano",
+              retries: 6
+            }
+          ]
+        })
+      });
+
+      await expect(subject.deploy()).resolves.toStrictEqual({
+        ok: false,
+        error:
+          "a22a/acme/summarise.json: ✖ Too big: expected number to be <=5\n  → at steps[0].retries"
+      });
+    });
+
     it("names the step with no model", async () => {
       const subject = await projects({
         "a22a/acme/summarise.json": JSON.stringify({

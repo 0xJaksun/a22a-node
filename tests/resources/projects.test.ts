@@ -41,12 +41,14 @@ const mockProject: Project = {
             id: "extract",
             model: "openai/gpt-5-nano",
             prompt: "Pull the facts from {{input.text}}",
+            retries: 2,
             needs: []
           },
           {
             id: "write",
             model: "openai/gpt-5-nano",
             prompt: "Summarise {{extract.output}}",
+            retries: 2,
             needs: ["extract"]
           }
         ]
