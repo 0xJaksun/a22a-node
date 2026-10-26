@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/logo-dark.png">
-  <img src=".github/logo-light.png" alt="A22A" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/0xJaksun/a22a-node/master/.github/logo-dark.png">
+  <img src="https://raw.githubusercontent.com/0xJaksun/a22a-node/master/.github/logo-light.png" alt="A22A" width="100%">
 </picture>
 
 # A22A Node.js Library
@@ -25,7 +25,7 @@ pnpm add @a22a/sdk
 
 ## Usage
 
-The package needs to be configured with your account's API key, which is available on the [A22A dashboard](https://a22a.sh).
+The package needs to be configured with your account's API key, which is available on the [A22A dashboard](https://app.a22a.sh).
 
 ```ts
 import { A22A } from "@a22a/sdk";
