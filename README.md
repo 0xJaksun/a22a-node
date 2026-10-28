@@ -9,7 +9,7 @@ The A22A Node.js library provides convenient access to the A22A API from applica
 
 ## Documentation
 
-See the [A22A docs](https://a22a.sh/docs).
+See the [A22A docs](https://docs.a22a.sh).
 
 ## Requirements
 
